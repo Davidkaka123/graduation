@@ -1,10 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title></title>
+    <meta charset="utf-8">
+    <title>第一个JavaScript API应用</title>
+    <!--<link rel="stylesheet" href="<?=$siteStylesUrl?>/esri.css">-->
+    <!--<link rel="stylesheet" href="http://js.arcgis.com/3.9/js/esri/css/esri.css">-->
+    <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/esri/css/esri.css">
+    <style>
+        html, body, #mapDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+    </style>
+    <!--<script src="http://js.arcgis.com/3.9/"></script>-->
+    <script src="<?=$controller->siteScriptsUrl?>/init.js"></script>
+    <!--<script src="<?=$siteScriptsUrl?>/init.js"></script>-->
+    <!--<script src="<?=$controller->siteScriptsUrl?>/js/esri/nls/jsapi_zh-cn.js"></script>-->
+    <!--<script src="<?=$controller->siteScriptsUrl?>/js/dojo/dojox/gfx/svg.js"></script>-->
+    <script>
+        require(["esri/map", "esri/layers/ArcGISTiledMapServiceLayer", "dojo/domReady!"], function (Map, ArcGISTiledMapServiceLayer) {
+            // 以下是创建地图与加入底图的代码
+            var map = new Map("mapDiv");
+            var agoServiceURL = "http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_StreetMap_World_2D/MapServer";
+            //var agoServiceURL = "http://localhost/arcgis/rest/services/SampleWorldCities/MapServer";
+            var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4, 5, 6, 7] });
+            map.addLayer(agoLayer);
+        });
+    </script>
 </head>
-<body>
-
+<body class="tundra">
+<div id="mapDiv"></div>
 </body>
 </html>
