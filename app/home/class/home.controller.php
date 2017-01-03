@@ -33,7 +33,8 @@ class HomeController extends AppController
     public function index()
     {
         $this->view->assign('controller', $this);
-        $this->view->display('homepage');
+        //$this->view->display('second');
+        $this->view->display('testContent');
     }
 
     public function add_user() {

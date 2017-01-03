@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>第一个JavaScript API应用</title>
+    <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css">
+    <style>
+        html, body, #mapDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+    </style>
+    <script src="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/"></script>
+    <script type="text/javascript">
+//        //通过dojo加载esri/map, esri/layers/ArcGISTiledMapServiceLayer和dojo/domReady模块
+//        require(["esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "dojo/domReady!"], function (Map, ArcGISTiledMapServiceLayer) {
+//            // 以下是创建地图与加入底图的代码
+//            //Map类，加载自esri/map模块， 参数是HTML中包含底图的DIV名称
+//            var map = new Map("mapDiv");
+//            //指定底图服务的URL
+//            //var agoServiceURL = "http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_StreetMap_World_2D/MapServer";
+//            var agoServiceURL = "http://localhost:6080/arcgis/rest/services/radiowatch/MapServer";
+//            //根据URL创建底图切片图层，构造函数第二个参数指定图层属性
+//            //var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4, 5] });
+//            var agoLayer = new ArcGISDynamicMapServiceLayer(agoServiceURL);
+//
+//            //创建好的图层加入底图中
+//            map.addLayer(agoLayer);
+//        });
+        dojo.require("dijit.layout.BorderContainer");
+        dojo.require("dijit.layout.ContentPane");
+        dojo.require("esri.map");
+        var map;
+        function init() {
+            map = new esri.Map("mapDiv");
+            var layer = new esri.layers.ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/radioproject/MapServer",
+                    {
+                        displayLevels: [0,1]
+                    });
+            map.addLayer(layer);
+            var resizeTimer;
+            dojo.connect(map, 'onLoad', function(theMap) {
+                dojo.connect(dijit.byId('map'), 'resize', function() {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(function() {
+                        map.resize();
+                        map.reposition();
+                    }, 500);
+                });
+            });
+        }
+        dojo.addOnLoad(init);
+    </script>
+</head>
+<body class="tundra">
+<div id="mapDiv"></div>
+</body>
+</html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+    <!--<meta http-equiv="content-type" content="text/html" charset="UTF-8">-->
+    <!--<meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>-->
+
+    <!--<title>Hello world</title>-->
+    <!--<link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css">-->
+    <!--<script src="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/"></script>-->
+    <!--<script>-->
+        <!--var map;-->
+        <!--require(["esri/map", "dojo/domReady!"], function(Map) {-->
+            <!--map = new Map("map", {-->
+                <!--basemap : "topo", //底图服务名称-->
+                <!--center : [116.45, 40.75], //底图中心点经纬度-->
+                <!--zoom : 3-->
+            <!--});-->
+
+            <!--var province = new FeatureLayer("http://localhost:6080/arcgis/rest/services/radiowatch/MapServer/5", {-->
+                <!--mode: FeatureLayer.MODE_ONDEMAND,-->
+                <!--outFields:["*"]-->
+            <!--});-->
+
+            <!--map.addLayers([province]);-->
+        <!--});-->
+
+
+    <!--</script>-->
+<!--</head>-->
+<!--<body>-->
+    <!--<div id="map"></div>-->
+<!--</body>-->
+<!--</html>-->
