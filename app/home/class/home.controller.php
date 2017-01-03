@@ -36,6 +36,13 @@ class HomeController extends AppController
         $this->view->display('HomePage');
     }
 
+    public function option()
+    {
+        $this->view->assign('controller', $this);
+        $this->view->display('ShowCoords');
+    }
+
+
     public function add_user() {
         $rtx = $this->getParam('u');
         $this->db->insert(array('rtx'=>$rtx, 'role'=>2), 't_user');
