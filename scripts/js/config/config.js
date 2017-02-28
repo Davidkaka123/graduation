@@ -17,6 +17,8 @@ var I129idwUrl = "http://localhost:6080/arcgis/rest/services/radiowatch/mapradio
 
 var I129krigUrl = "http://localhost:6080/arcgis/rest/services/radiowatch/interpolationKrig/MapServer";
 
-var chinaDraUrl = "http://localhost/arcgis/rest/services/radiowatch/ChinaDra/MapServer";
+var chinaDraUrl = "http://localhost:6080/arcgis/rest/services/radiowatch/ChinaDra/MapServer";
 
+var bufferedbefore = "http://localhost:6080/arcgis/rest/services/radiowatch/bufferedBefore/MapServer";
 
+var bufferedafter = "http://localhost:6080/arcgis/rest/services/radiowatch/bufferedafter/MapServer";

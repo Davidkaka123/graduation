@@ -44,12 +44,15 @@
                                 sliderStyle : "large"
                             });
 
-                    var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4] });
+//                    var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4] });
+//
+//                    map.addLayer(agoLayer);
 
-                    map.addLayer(agoLayer);
-
-                    var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(dynamicUrl);
+                    var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(bufferedbefore);
                     map.addLayer(dynamicMapServiceLayer);
+
+//                    var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(bufferedafter);
+//                    map.addLayer(dynamicMapServiceLayer);
 
                     map.on('mouse-move', showCoordinates);
                     map.on('mouse-drag', showCoordinates);
@@ -95,24 +98,25 @@
                 选择采样日期：
                 <input type="date" id="startdate" value="2017-01-21" />
                 <br>
-                缓冲要素：
-                <select id="bufferedItem" style="height: 30px;width: 136px;">
-                    <option value="In" selected>水域</option>
+                <br>
+                <FONT style="font-size: 9pt">缓冲要素：&nbsp;&nbsp;缓冲距离：</FONT>
+                <select id="bufferedItem" style="height: 30px;width: 40%;">
+                    <option value="In" >水域</option>
+                    <option value="In" selected>湖泊水库</option>
                     <option value="Pun" >行政区</option>
                     <!--<option value="Sr" >铯核素</option>-->
                 </select>
-                
-                缓冲距离：
-                <select id="bufferedDistance" style="height: 30px;width: 136px;">
-                    <option value="In" selected>5</option>
-                    <option value="10" >10</option>
-                    <option value="15" >15</option>
-                    <option value="20" >20</option>
-                    <option value="30" >30</option>
-                    <!--<option value="Sr" >铯核素</option>-->
-                </select>
-                <br>
 
+                <select id="bufferedDistance" style="height: 30px;width: 40%;">
+                    <option value="In" selected>1</option>
+                    <option value="10" >3</option>
+                    <option value="15" >5</option>
+                    <option value="20" >10</option>
+                    <option value="30" >20</option>
+                    <!--<option value="Sr" >铯核素</option>-->
+                </select><FONT style="font-size: 9pt">公里</FONT>
+                <br>
+                <br>
                 选择样品类型：
                 <select id="sampleType" style="height: 30px;width: 136px;">
                     <option value="In" selected>碘核素</option>
@@ -120,16 +124,15 @@
                     <option value="Sr" >铯核素</option>
                 </select>
                 <br>
-                选择查询核素类型：
-                <select id="task" style="height: 30px;width: 136px;">
-                    <option value="表层土壤样品" >表层土壤样品</option>
-                    <option value="样品信息" selected>沉积物剖面</option>
-                </select>
+                <!--选择查询核素类型：-->
+                <!--<select id="task" style="height: 30px;width: 136px;">-->
+                    <!--<option value="表层土壤样品" >表层土壤样品</option>-->
+                    <!--<option value="样品信息" selected>沉积物剖面</option>-->
+                <!--</select>-->
+                <br>
+                <button data-dojo-type="dijit/form/Button" >缓冲区查询</button>
+                <br>
 
-                <button data-dojo-type="dijit/form/Button" >多边形查询</button>
-                <br>
-                <button data-dojo-type="dijit/form/Button">已完成查询</button>
-                <br>
             </div>
             <div data-dojo-type="dijit/layout/ContentPane" style="width: 100%" title="图层控制">
                 <br>
