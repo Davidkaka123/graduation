@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>环境放射性信息平台</title>
+    <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/tundra/tundra.css" />
+    <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css" />
+    <style>
+        html, body, #main{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+
+    </style>
+    <script type="text/javascript">
+        dojoConfig = {
+            isDebug: true,
+            async: true
+        };
+    </script>
+    <script src="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/"></script>
+    <script src="<?=$controller->siteScriptsUrl?>/js/config/config.js"></script>
+    <script type="text/javascript" src='<?=$controller->siteScriptsUrl?>/js/jQuery/jquery.min.js'></script>
+    <link rel="stylesheet" type="text/css" href='<?=$controller->siteScriptsUrl?>/js/jQuery/themes/gray/easyui.css'>
+    <link rel="stylesheet" type="text/css" href="<?=$controller->siteScriptsUrl?>/js/jQuery/themes/icon.css">
+    <script type="text/javascript" src='<?=$controller->siteScriptsUrl?>/js/jQuery/jquery.easyui.min.js'></script>
+    <script type="text/javascript" src='<?=$controller->siteScriptsUrl?>/js/jQuery/locale/easyui-lang-zh_CN.js' charset="utf-8"></script>
+
+    <script type="text/javascript">
+        require([
+                    "dojo/parser",
+                    "esri/map",
+                    "esri/layers/ArcGISTiledMapServiceLayer",
+                    "esri/layers/ArcGISDynamicMapServiceLayer",
+                    "dijit/layout/BorderContainer",
+                    "dijit/layout/ContentPane",
+                    "dijit/layout/AccordionContainer",
+                    "dojo/domReady!"],
+                function (parser, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer) {
+                    parser.parse();
+
+                    var map = new Map(
+                            "mapDiv",
+                            {
+                                logo : false,
+                                center: [116.442, 40.257],
+                                zoom : 1,
+                                sliderStyle : "large"
+                            });
+
+
+                    var layer = new ArcGISDynamicMapServiceLayer("http://localhost/arcgis/rest/services/radiowatch/mainlandSelect/MapServer");
+
+//                    if (layer.loaded) {
+//                        buildLayerList(layer);
+//                    } else {
+//                        dojo.connect(layer, "onLoad", buildLayerList);
+//                    }
+                    //map.addLayer(dynamicMapServiceLayer);
+
+
+                    map.addLayer(layer);
+
+
+                });
+
+        function getChildrenNodes(parentnodes, node){
+            for (var i = parentnodes.length - 1; i >= 0; i--) {
+
+                var pnode = parentnodes[i];
+                //如果是父子关系，为父节点增加子节点，退出for循环
+                if (pnode.id==node.pid) {
+                    pnode.state="closed" ;//关闭二级树
+                    pnode.children.push(node) ;
+                    return ;
+                } else {
+                    //如果不是父子关系，删除父节点栈里当前的节点，
+                    //继续此次循环，直到确定父子关系或不存在退出for循环
+                    parentnodes.pop() ;
+                }
+            }
+        }
+
+        function buildLayerList(layer) {
+            //构建图层树形结构
+            var layerinfos = layer.layerInfos ;
+            var treeList = [] ;//jquery-easyui的tree用到的tree_data.json数组
+            var parentnodes = [] ;//保存所有的父亲节点
+            var root = {"id":"rootnode","text":"所有图层","children":[]} ;//增加一个根节点
+            var node = {} ;
+            if (layerinfos != null && layerinfos.length > 0) {
+
+                for(var i=0,j=layerinfos.length;i<j;i++){
+                    var info = layerinfos[i] ;
+                    if (info.defaultVisibility) {
+                        visible.push(info.id);
+                    }
+                    //node为tree用到的json数据
+                    node = {
+                        "id":info.id,
+                        "text":info.name,
+                        "pid":info.parentLayerId,
+                        "checked":info.defaultVisibility ? true:false,
+                        "children":[]
+                    } ;
+                    if(info.parentLayerId==-1){
+                        parentnodes.push(node) ;
+                        root.children.push(node) ;
+                    }else{
+                        getChildrenNodes(parentnodes, node);
+                        parentnodes.push(node) ;
+                    }
+                }
+            }
+            treeList.push(root) ;
+            //jquery-easyui的树
+            $('#toc').tree({
+                data:treeList ,
+                checkbox :true, //使节点增加选择框
+                onCheck:function (node,checked){//更新显示选择的图层
+                    var visible = [];
+
+                    var nodes = $('#toc').tree("getChecked") ;
+                    dojo.forEach(nodes, function(node) {
+                        visible.push(node.id);
+                    });
+                    //if there aren't any layers visible set the array to be -1
+                    if (visible.length === 0) {
+                        visible.push(-1);
+                    }
+                    layer.setVisibleLayers(visible);
+                }
+            });
+
+
+            layer.setVisibleLayers(visible);
+            map.addLayer(layer);
+        }
+
+
+    </script>
+</head>
+<body class="tundra">
+<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false"  id="main">
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"
+         style="background-color: blue; background-image: url(<?=$controller->imagesUrl?>/header.jpg);background-repeat: no-repeat; height: 12%;">
+        <img src="<?=$controller->imagesUrl?>/logo.png" style="width:40%;height:100%;position:absolute;z-index:-1;">
+        <img src="<?=$controller->imagesUrl?>/header.jpg" align="right" style="width:60%;height:100%;position:relative;">
+    </div>
+
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left', splitter:'true'"
+         style="background-color: #acb386; width: 200px;">
+        <div id="accordionContainer" data-dojo-type="dijit/layout/AccordionContainer"
+             style="padding: 0px; overflow: hidden; z-index: 29;">
+            <div data-dojo-type="dijit/layout/ContentPane" title="主页" style="overflow: hidden;">
+                <div id="findServicesDiv">
+                </div>
+            </div>
+            <div id="identifyResultsPane" data-dojo-type="dijit/layout/ContentPane" style="overflow: hidden;" title="核素查询">
+                <div id="resultsDiv">
+                </div>
+                <br>
+            </div>
+            <div id="parcelResultsPane" data-dojo-type="dijit/layout/ContentPane" title="插值分析">
+            </div>
+            <div id="ResultsPane" data-dojo-type="dijit/layout/ContentPane" title="缓冲区分析">
+            </div>
+            <div data-dojo-type="dijit/layout/ContentPane" style="width: 100%" title="图层控制">
+                <br>
+                <!--<div id="layerConfigDiv">-->
+                <!--</div>-->
+                <div id="panelHeader"
+                     style="width: 100%; height: 100%;">
+                    图层控制：<br />
+                    <ul id="toc" class="easyui-tree" checkbox="true">
+                        <li>
+                            <span>所有图层</span>
+                            <ul>
+                                <li >
+                                    <span>行政区图层</span>
+                                </li>
+                                <li >
+                                    <span>主要水域面图层</span>
+                                </li>
+                                <li >
+                                    <span>主要水域线图层</span>
+                                </li>
+                                <li >
+                                    <span>省界线图层</span>
+                                </li>
+                                <li >
+                                    <span>省界面图层</span>
+                                </li>
+                                <li >
+                                    <span>国界面图层</span>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapDiv" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"
+         style="background-color: #f5ffbf; padding: 10px;">
+        <div id="mapPosition" style="background-color:whitesmoke; font-weight:bolder; font-size:smaller; position:absolute; padding:3px;left:30px; bottom:6px; z-index:99;"></div>
+
+    </div>
+
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right', splitter:'true'"
+         style="background-color: #E0FFFF; width: 200px;">
+        环境放射性信息平台: <br><br>       李树为（科研用户）      <br><br><br>
+
+    </div>
+
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:'true'"
+         style="background-color: #E8E8E8; height: 85px;text-align: center">
+        <P><FONT style="font-size: 9pt">地　　址：陕西省西安市咸宁西路２８号　邮编７１００４９</FONT></P>
+        <P><FONT style="font-size: 9pt">版权所有：西安交通大学　软件学院　　　　　　　　　　　</FONT></P>
+    </div>
+</div>
+</body>
+</html>

@@ -39,7 +39,7 @@ class HomeController extends AppController
     public function option()
     {
         $this->view->assign('controller', $this);
-        $this->view->display('ShowCoords');
+        $this->view->display('TestPage');
     }
 
 

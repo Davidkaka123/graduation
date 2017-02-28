@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>环境放射性信息平台</title>
+    <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/tundra/tundra.css" />
+    <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css" />
+    <style>
+        html, body, #main{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+
+    </style>
+    <script type="text/javascript">
+        dojoConfig = {
+            isDebug: true,
+            async: true
+        };
+    </script>
+    <script src="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/"></script>
+    <script src="<?=$controller->siteScriptsUrl?>/js/config/config.js"></script>
+
+    <script type="text/javascript">
+        require([
+                    "dojo/parser",
+                    "esri/map",
+                    "esri/layers/ArcGISTiledMapServiceLayer",
+                    "esri/layers/ArcGISDynamicMapServiceLayer",
+                    "dojo/dom","dojo/on","dojo/query",
+                    "esri/symbols/SimpleMarkerSymbol",
+                    "esri/symbols/SimpleLineSymbol",
+                    "esri/symbols/SimpleFillSymbol",
+                    "esri/toolbars/draw",
+                    "esri/graphic",
+                    "esri/tasks/PrintTask",
+                    "esri/tasks/PrintTemplate",
+                    "esri/tasks/PrintParameters",
+                    "dojo/colors",
+                    "dijit/layout/BorderContainer",
+                    "dijit/layout/ContentPane",
+                    "dijit/layout/AccordionContainer",
+                    "dojo/domReady!"],
+                function (parser, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer,
+                          dom, on, query, SimpleMarkerSymbol,
+                          SimpleLineSymbol,
+                          SimpleFillSymbol,
+                          Draw,
+                          Graphic,
+                          PrintTask, PrintTemplate, PrintParameters,
+                          Color) {
+                    parser.parse();
+
+                    var map = new Map(
+                            "mapDiv",
+                            {
+                                logo : false,
+                                center: [116.442, 40.257],
+                                zoom : 1,
+                                sliderStyle : "large"
+                            });
+
+                    var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4] });
+
+                    map.addLayer(agoLayer);
+
+                    var krigMapServiceLayer = new ArcGISDynamicMapServiceLayer(I129krigUrl);
+
+                    map.addLayer(krigMapServiceLayer);
+
+                    var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(sedimentUrl);
+                    map.addLayer(dynamicMapServiceLayer);
+
+                    //创建绘图对象
+                    var toolBar = new Draw(map);
+                    //线符号
+                    lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new Color([255, 0, 0]), 3);
+                    //面符号
+                    polygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol, new Color([255, 0, 0, 0.25]));
+
+                    //给绘制polygon的按钮绑定事件
+                    query(".pbtn").on("click",function(event){
+                        //激活绘制多边形
+                        toolBar.activate(Draw.POLYGON, {
+                            showTooltips:true
+                        })
+
+                    })
+                    //绘图结束绑定事件
+                    on(toolBar,"draw-end",function(result){
+                        //获得面形状
+                        var geometry=result.geometry;
+                        //创建Graphic
+                        var graphicpoint= new Graphic(geometry, polygonSymbol);
+                        map.graphics.add(graphicpoint);
+                        //关闭绘图工具
+                        toolBar.deactivate();
+                    })
+                    //给地图打印按钮绑定事件
+                    on(dom.byId("Btn"),"click",function(){
+                        //创建地图打印对象
+                        var printMap = new PrintTask("http://localhost:6080/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task");
+                        //创建地图打印模版
+                        var template = new PrintTemplate();
+                        //创建地图的打印参数，参数里面包括：模版和地图
+                        var params = new PrintParameters();
+                        //输出图片的空间参考
+                        printMap.outSpatialReference = map.SpatialReference
+                        //打印图片的各种参数
+                        template.exportOptions = {
+                            width: 850,
+                            height: 650,
+                            dpi: 96
+                        };
+                        //打印输出的格式
+                        template.format = "PDF";
+                        //输出地图的布局
+                        template.layout = "MAP_ONLY";
+                        PrintTemplate
+                        //设置参数地图
+                        params.map = map;
+                        //设置参数模版
+                        params.template = template;
+                        //运行结果
+                        printMap.execute(params, function(result){
+                            if (result != null) {
+                                //网页打开生成的地图
+                                window.open(result.url);
+                            }
+                        })
+                    })
+
+
+                });
+
+
+    </script>
+</head>
+<body class="tundra">
+<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false"  id="main">
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"
+         style="background-color: blue; background-image: url(<?=$controller->imagesUrl?>/header.jpg);background-repeat: no-repeat; height: 12%;">
+        <img src="<?=$controller->imagesUrl?>/logo.png" style="width:40%;height:100%;position:absolute;z-index:-1;">
+        <img src="<?=$controller->imagesUrl?>/header.jpg" align="right" style="width:60%;height:100%;position:relative;">
+    </div>
+
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left', splitter:'true'"
+         style="background-color: #acb386; width: 200px;">
+        <div id="accordionContainer" data-dojo-type="dijit/layout/AccordionContainer"
+             style="padding: 0px; overflow: hidden; z-index: 29;">
+            <div data-dojo-type="dijit/layout/ContentPane" title="主页" style="overflow: hidden;">
+                <div id="findServicesDiv" style="text-align:center;">
+                    <img src="<?=$controller->imagesUrl?>/leftLogo.jpg" style="width:75%;height:100%;">
+                </div>
+
+                <FONT style="font-size: 9pt">&nbsp &nbsp该系统是一款面向普通大众以及相关科研人员的实现环境放射性信息可视化的平台，
+                    主要包括了地图操作、放射性核素信息查询、放射性核素数据分析、图层控制、地图打印等主要功能。
+                </FONT>
+                <br><br>
+                <button class="pbtn" data-dojo-type="dijit/form/Button">地图标注</button>
+                <!--<input id="Btn" data-dojo-type="dijit/form/Button" value="地图打印" />-->
+                <br><br>
+                <button id="Btn" class="pbtn" data-dojo-type="dijit/form/Button">地图打印</button>
+            </div>
+            <div id="identifyResultsPane" data-dojo-type="dijit/layout/ContentPane" style="overflow: hidden;" title="核素查询">
+                <div id="resultsDiv">
+                </div>
+                <br>
+            </div>
+            <div id="parcelResultsPane" data-dojo-type="dijit/layout/ContentPane" title="插值分析">
+            </div>
+            <div id="ResultsPane" data-dojo-type="dijit/layout/ContentPane" title="缓冲区分析">
+            </div>
+            <div data-dojo-type="dijit/layout/ContentPane" style="width: 100%" title="图层控制">
+                <br>
+                <div id="layerConfigDiv">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapDiv" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"
+         style="background-color: #f5ffbf; padding: 10px;">
+        <div id="mapPosition" style="background-color:whitesmoke; font-weight:bolder; font-size:smaller; position:absolute; padding:3px;left:30px; bottom:6px; z-index:99;"></div>
+
+    </div>
+
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right', splitter:'true'"
+         style="background-color: #E0FFFF; width: 200px;">
+        环境放射性信息平台: <br><br>       李树为（科研用户）      <br><br><br>
+
+    </div>
+
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:'true'"
+         style="background-color: #E8E8E8; height: 85px;text-align: center">
+        <P><FONT style="font-size: 9pt">地　　址：陕西省西安市咸宁西路２８号　邮编７１００４９</FONT></P>
+        <P><FONT style="font-size: 9pt">版权所有：西安交通大学　软件学院　　　　　　　　　　　</FONT></P>
+    </div>
+</div>
+</body>
+</html>

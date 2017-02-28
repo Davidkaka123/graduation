@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>页面布局</title>
+    <title>环境放射性信息平台</title>
     <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/tundra/tundra.css" />
     <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css" />
     <style>
@@ -10,6 +10,8 @@
             height: 100%;
             margin: 0;
         }
+
+
     </style>
     <script type="text/javascript">
         dojoConfig = {
@@ -29,9 +31,8 @@
                     "dijit/layout/BorderContainer",
                     "dijit/layout/ContentPane",
                     "dijit/layout/AccordionContainer",
-                    "dojo/string",
                     "dojo/domReady!"],
-                function (parser, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, string) {
+                function (parser, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer) {
                     parser.parse();
 
                     var map = new Map(
@@ -39,9 +40,12 @@
                             {
                                 logo : false,
                                 center: [116.442, 40.257],
-                                zoom : 1
+                                zoom : 1,
+                                sliderStyle : "large"
                             });
+
                     var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4] });
+
                     map.addLayer(agoLayer);
 
                     var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(dynamicUrl);
@@ -67,24 +71,27 @@
 <body class="tundra">
 <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false"  id="main">
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"
-         style="background-color: #b39b86; height: 6%;">
-        放置单位或公司标志、本应用系统名称等
+         style="background-color: blue; background-image: url(<?=$controller->imagesUrl?>/header.jpg);background-repeat: no-repeat; height: 12%;">
+        <img src="<?=$controller->imagesUrl?>/logo.png" style="width:40%;height:100%;position:absolute;z-index:-1;">
+        <img src="<?=$controller->imagesUrl?>/header.jpg" align="right" style="width:60%;height:100%;position:relative;">
     </div>
 
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left', splitter:'true'"
          style="background-color: #acb386; width: 200px;">
         <div id="accordionContainer" data-dojo-type="dijit/layout/AccordionContainer"
              style="padding: 0px; overflow: hidden; z-index: 29;">
-            <div data-dojo-type="dijit/layout/ContentPane" title="查询" style="overflow: hidden;">
+            <div data-dojo-type="dijit/layout/ContentPane" title="主页" style="overflow: hidden;">
                 <div id="findServicesDiv">
                 </div>
             </div>
-            <div id="identifyResultsPane" data-dojo-type="dijit/layout/ContentPane" style="overflow: hidden;" title="查询结果">
+            <div id="identifyResultsPane" data-dojo-type="dijit/layout/ContentPane" style="overflow: hidden;" title="核素查询">
                 <div id="resultsDiv">
                 </div>
                 <br>
             </div>
-            <div id="parcelResultsPane" data-dojo-type="dijit/layout/ContentPane" title="缓冲区分析">
+            <div id="parcelResultsPane" data-dojo-type="dijit/layout/ContentPane" title="插值分析">
+            </div>
+            <div id="ResultsPane" data-dojo-type="dijit/layout/ContentPane" title="缓冲区分析">
             </div>
             <div data-dojo-type="dijit/layout/ContentPane" style="width: 100%" title="图层控制">
                 <br>
@@ -101,13 +108,14 @@
     </div>
 
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right', splitter:'true'"
-         style="background-color: #acb386; width: 200px;">
-        显示结果等信息
+         style="background-color: #E0FFFF; width: 200px;">
+        欢迎光临环境放射性信息平台
     </div>
 
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:'true'"
-         style="background-color: #b39b86; height: 50px;">
-        版权信息等
+         style="background-color: #E8E8E8; height: 70px;text-align: center">
+        <P><FONT style="font-size: 9pt">地　　址：陕西省西安市咸宁西路２８号　邮编７１００４９</FONT></P>
+        <P><FONT style="font-size: 9pt">版权所有：西安交通大学　软件学院　　　　　　　　　　　</FONT></P>
     </div>
 </div>
 </body>

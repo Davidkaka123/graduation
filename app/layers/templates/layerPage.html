@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>图层控制器测试</title>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/soria/soria.css" />
+    <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/esri/css/esri.css" />
+    <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/radioproject/widgets/themes/darkangel/darkangel.css" />
+    <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/radioproject/widgets/themes/darkangel/override.css" />
+    <style>
+        html, body, #mapDiv {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <script>
+        var dojoConfig = {
+            locale: 'en',
+            isDebug: true,
+            async: true,
+            packages: [{
+                "name": "radioproject",
+                "location": location.pathname.replace(/\/[^/]+$/, "") + "<?=$controller->siteScriptsUrl?>/js/radioproject"
+            }]
+        };
+    </script>
+    <script src="http://js.arcgis.com/3.9/"></script>
+    <script>
+        var map;
+        var toc = null;
+
+        require(["dojo/parser",
+                    "dojo/_base/window",
+                    "dojo/dom-style",
+                    "dojo/topic",
+                    "dijit/registry",
+                    "esri/map", "esri/layers/ArcGISTiledMapServiceLayer",
+                    "esri/layers/ArcGISDynamicMapServiceLayer",
+                    "radioproject/widgets/TocWidget",
+                    "radioproject/widgets/Menu",
+                    "radioproject/widgets/MenuItem",
+                    "radioproject/widgets/WidgetContainer",
+                    "radioproject/widgets/MenuFrame",
+                    "dojo/domReady!"],
+            function (parser, win, domStyle, topic, registry, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, TocWidget, Menu) {
+                parser.parse();
+
+                map = new Map("mapDiv");
+
+                var streetMap = new ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_StreetMap_World_2D/MapServer", { id: "街道地图" });
+                map.addLayer(streetMap);
+
+                var imageryPrime = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_Imagery_World_2D/MapServer", { id: "影像", opacity: 0, visible: true });
+                map.addLayer(imageryPrime);
+                imageryPrime.setOpacity(1.0);
+
+                var censusData = new esri.layers.ArcGISDynamicMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer", { id: "美国人口普查", visible: true });
+                censusData.setOpacity(0.75);
+                map.addLayer(censusData);
+
+                var layer = new esri.layers.ArcGISDynamicMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Louisville/LOJIC_LandRecords_Louisville/MapServer", { id: '路易斯维尔地籍' });
+                layer.setOpacity(0.5);
+                map.addLayer(layer);
+
+                createWidget();
+                createMenu();
+
+                function createWidget() {
+                    toc = new TocWidget();
+                    toc.setTitle("图层控制器");
+                    toc.setMap(map);
+                }
+
+                function createMenu() {
+                    var menuFrame = registry.byId('menuFrame');
+                    var logoUrl = require.toUrl("radioproject/widgets/assets/images/logo.png");
+                    menuFrame.setFrameIcon(logoUrl);
+                    menuFrame.setTitle("菜单");
+
+                    var params = { label: "工具", icon: "assets/images/icons/i_globe.png", positionAsPct: 20, visible: true };
+                    var toolMenu = new Menu(params);
+                    toolMenu.addMenuItem({ label: "图层控制器", icon: "assets/images/icons/i_highway.png", visible: true, onMenuItemClick: testMenuItemClick });
+                    menuFrame.addChild(toolMenu);
+                    toolMenu.startup();
+                }
+
+                function testMenuItemClick(evt) {
+                    topic.publish("showWidget", toc);
+                }
+
+            });
+    </script>
+</head>
+<body class="soria">
+    <div id="mapDiv">
+        <div data-dojo-type="radioproject/widgets/MenuFrame" id='menuFrame' style="left: 50px;"></div>
+        <div data-dojo-type="radioproject/widgets/WidgetContainer" id='widgetContainer'></div>
+    </div>
+</body>
+</html>
