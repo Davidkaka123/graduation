@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>环境放射性信息平台</title>
+    <title>Load环境放射性信息平台</title>
     <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/tundra/tundra.css" />
     <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css" />
     <style>
@@ -13,6 +13,9 @@
 
 
     </style>
+    <script language=javascript>
+        var t1 = new Date().getTime();
+    </script>
     <script type="text/javascript">
         dojoConfig = {
             isDebug: true,
@@ -48,13 +51,13 @@
                             });
                     //加载基础地理信息数据
                     //生成基础地理信息图层
-                    var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4] });
+                    var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL);
                     //将新图层叠加到地图
                     map.addLayer(agoLayer);
                     //加载放射性核素数据
-                    var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(dynamicUrl);
-                    //将核素数据图层叠加到地图
-                    map.addLayer(dynamicMapServiceLayer);
+//                    var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/radiowatch/ChinaDra/MapServer");
+//                    //将核素数据图层叠加到地图
+//                    map.addLayer(dynamicMapServiceLayer);
 
                     map.on('mouse-move', showCoordinates);
                     map.on('mouse-drag', showCoordinates);
@@ -73,6 +76,12 @@
     </script>
 </head>
 <body class="tundra">
+<SCRIPT LANGUAGE="JavaScript">
+    window.onload = function()
+    {
+        document.getElementById("TimeShow").innerHTML = "加载本页耗时 "+ (new Date().getTime()-t1) +" 毫秒";
+    }
+</SCRIPT>
 <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false"  id="main">
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"
          style="background-color: blue; background-image: url(<?=$controller->imagesUrl?>/header.jpg);background-repeat: no-repeat; height: 12%;">
@@ -114,6 +123,7 @@
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right', splitter:'true'"
          style="background-color: #E0FFFF; width: 200px;">
         欢迎光临环境放射性信息平台
+        <div id="TimeShow"></div>
     </div>
 
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:'true'"

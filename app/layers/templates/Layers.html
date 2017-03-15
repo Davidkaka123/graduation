@@ -30,101 +30,106 @@
 
 
     <script type="text/javascript">
-//        dojo.require("esri.map");
-//
-//        var layer, map, visible = [];
-//
-//        function init() {
-//            map = new esri.Map("mapDiv",
-//                            {
-//                                logo : false,
-//                                center: [116.442, 40.257],
-//                                zoom : 1,
-//                                sliderStyle : "large"
-//                            });
-//            layer = new esri.layers.ArcGISDynamicMapServiceLayer("http://localhost/arcgis/rest/services/radiowatch/ChinaDra/MapServer");
-//
-//            if (layer.loaded) {
-//                buildLayerList(layer);
-//            } else {
-//                dojo.connect(layer, "onLoad", buildLayerList);
-//            }
-//        }
-//
-//        function getChildrenNodes(parentnodes, node){
-//            for (var i = parentnodes.length - 1; i >= 0; i--) {
-//
-//                var pnode = parentnodes[i];
-//                //如果是父子关系，为父节点增加子节点，退出for循环
-//                if (pnode.id==node.pid) {
-//                    pnode.state="closed" ;//关闭二级树
-//                    pnode.children.push(node) ;
-//                    return ;
-//                } else {
-//                    //如果不是父子关系，删除父节点栈里当前的节点，
-//                    //继续此次循环，直到确定父子关系或不存在退出for循环
-//                    parentnodes.pop() ;
-//                }
-//            }
-//        }
-//
-//        function buildLayerList(layer) {
-//            //构建图层树形结构
-//            var layerinfos = layer.layerInfos ;
-//            var treeList = [] ;//jquery-easyui的tree用到的tree_data.json数组
-//            var parentnodes = [] ;//保存所有的父亲节点
-//            var root = {"id":"rootnode","text":"所有图层","children":[]} ;//增加一个根节点
-//            var node = {} ;
-//            if (layerinfos != null && layerinfos.length > 0) {
-//
-//                for(var i=0,j=layerinfos.length;i<j;i++){
-//                    var info = layerinfos[i] ;
-//                    if (info.defaultVisibility) {
-//                        visible.push(info.id);
-//                    }
-//                    //node为tree用到的json数据
-//                    node = {
-//                        "id":info.id,
-//                        "text":info.name,
-//                        "pid":info.parentLayerId,
-//                        "checked":info.defaultVisibility ? true:false,
-//                        "children":[]
-//                    } ;
-//                    if(info.parentLayerId==-1){
-//                        parentnodes.push(node) ;
-//                        root.children.push(node) ;
-//                    }else{
-//                        getChildrenNodes(parentnodes, node);
-//                        parentnodes.push(node) ;
-//                    }
-//                }
-//            }
-//            treeList.push(root) ;
-//            //jquery-easyui的树
-//            $('#toc').tree({
-//                data:treeList ,
-//                checkbox :true, //使节点增加选择框
-//                onCheck:function (node,checked){//更新显示选择的图层
-//                    var visible = [];
-//
-//                    var nodes = $('#toc').tree("getChecked") ;
-//                    dojo.forEach(nodes, function(node) {
-//                        visible.push(node.id);
-//                    });
-//                    //if there aren't any layers visible set the array to be -1
-//                    if (visible.length === 0) {
-//                        visible.push(-1);
-//                    }
-//                    layer.setVisibleLayers(visible);
-//                }
-//            });
-//
-//
-//            layer.setVisibleLayers(visible);
-//            map.addLayer(layer);
-//        }
-//
-//        dojo.ready(init);
+        dojo.require("esri.map");
+
+        var layer, map, visible = [];
+
+        function init() {
+            map = new esri.Map("mapDiv",
+                            {
+                                //设置地图对象属性
+                                logo : false,
+                                center: [116.442, 40.257],
+                                zoom : 1,
+                                sliderStyle : "large"
+                            });
+            //获取地图资源
+            layer = new esri.layers.ArcGISDynamicMapServiceLayer("http://localhost/arcgis/rest/services/radiowatch/ChinaDra/MapServer");
+            //资源状态判断
+            if (layer.loaded) {
+                buildLayerList(layer);
+            } else {
+                dojo.connect(layer, "onLoad", buildLayerList);
+            }
+        }
+        //获取地图子图层
+        function getChildrenNodes(parentnodes, node){
+            for (var i = parentnodes.length - 1; i >= 0; i--) {
+
+                var pnode = parentnodes[i];
+                //如果是父子关系，为父节点增加子节点，退出for循环
+                if (pnode.id==node.pid) {
+                    pnode.state="closed" ;//关闭二级树
+                    pnode.children.push(node) ;
+                    return ;
+                } else {
+                    //如果不是父子关系，删除父节点栈里当前的节点，
+                    //继续此次循环，直到确定父子关系或不存在退出for循环
+                    parentnodes.pop() ;
+                }
+            }
+        }
+
+        function buildLayerList(layer) {
+            //构建图层树形结构
+            var layerinfos = layer.layerInfos ;
+            var treeList = [] ;//jquery-easyui的tree用到的tree_data.json数组
+            var parentnodes = [] ;//保存所有的父亲节点
+            var root = {"id":"rootnode","text":"所有图层","children":[]} ;//增加一个根节点
+            var node = {} ;
+            if (layerinfos != null && layerinfos.length > 0) {
+                //按图层层级结构顺序添加图层
+                for(var i=0,j=layerinfos.length;i<j;i++){
+                    var info = layerinfos[i] ;
+                    if (info.defaultVisibility) {
+                        visible.push(info.id);
+                    }
+                    //node为tree用到的地图数据
+                    node = {
+                        "id":info.id,
+                        "text":info.name,
+                        "pid":info.parentLayerId,
+                        "checked":info.defaultVisibility ? true:false,
+                        "children":[]
+                    } ;
+                    //判断节点状态
+                    if(info.parentLayerId==-1){
+                        parentnodes.push(node) ;
+                        root.children.push(node) ;
+                    }else{
+                        //保存图层层级属性
+                        getChildrenNodes(parentnodes, node);
+                        parentnodes.push(node) ;
+                    }
+                }
+            }
+            treeList.push(root) ;
+            //调用图层控制页面的jquery-easyui的树
+            $('#toc').tree({
+                data:treeList ,
+                checkbox :true, //使节点增加选择框
+                onCheck:function (node,checked){//更新显示选择的图层
+                    var visible = [];
+
+                    var nodes = $('#toc').tree("getChecked") ;
+                    dojo.forEach(nodes, function(node) {
+                        visible.push(node.id);
+                    });
+                    //已经没有图层情况处理
+                    if (visible.length === 0) {
+                        visible.push(-1);
+                    }
+                    //设置图层当前状态
+                    layer.setVisibleLayers(visible);
+                }
+            });
+
+
+            layer.setVisibleLayers(visible);
+            map.addLayer(layer);
+        }
+
+        dojo.ready(init);
 
 
         require([
