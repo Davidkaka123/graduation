@@ -30,10 +30,34 @@ class HomeController extends AppController
     /**
      * 解析方法
      */
+    public function login()
+    {
+        $this->view->assign('controller', $this);
+        $this->view->display('index');
+    }
+    public function logincheck()
+    {
+        $this->view->assign('controller', $this);
+        $userName = $this->getParam('name');
+        $userPasswd = $this->getParam('passwd');
+        $sql = "select userName, realName, passwd, roleName from AdminUser,roletable where userName = '{$userName}' and roleId = roletable.id";
+        $this->db->query("SET NAMES UTF8");
+        $row = $this->db->getRow($sql);
+        $res = $this->model->loginCheck($userName, $userPasswd, $row);
+        if ($res) {
+            $this->session->set('userName', $userName);
+            $this->session->set('realName', $row['realName']);
+            $this->session->set('userRole', $row['roleName']);
+            $this->view->assign('userInfo', $row);
+            $this->view->display('FirstPage');
+        } else {
+            $this->view->display('index');
+        }
+    }
     public function index()
     {
         $this->view->assign('controller', $this);
-        $this->view->display('HomePage');
+        $this->view->display('FirstPage');
     }
 
     public function option()

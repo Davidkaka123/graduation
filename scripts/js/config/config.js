@@ -24,3 +24,5 @@ var bufferedbefore = "http://localhost:6080/arcgis/rest/services/radiowatch/buff
 var bufferedafter = "http://localhost:6080/arcgis/rest/services/radiowatch/bufferedafter/MapServer";
 
 var cached = "http://127.0.0.1:8080/tilemap?level={z}&ix={x}&iy={y}";
+
+var pTaskUrl = "http://localhost:6080/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task";

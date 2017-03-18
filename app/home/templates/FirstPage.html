@@ -66,12 +66,17 @@
 
                     map.addLayer(agoLayer);
 
-                    var krigMapServiceLayer = new ArcGISDynamicMapServiceLayer(I129krigUrl);
+                    var surfaceMapServiceLayer = new ArcGISDynamicMapServiceLayer(dynamicUrl);
 
-                    map.addLayer(krigMapServiceLayer);
+                    map.addLayer(surfaceMapServiceLayer);
 
-                    var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(sedimentUrl);
-                    map.addLayer(dynamicMapServiceLayer);
+                    var sedimeMapServiceLayer = new ArcGISDynamicMapServiceLayer(sedimentUrl);
+                    map.addLayer(sedimeMapServiceLayer);
+
+                    on(dom.byId("querySample"), "click", function(){
+                        alert("过滤啦");
+                    });
+
 
                     //创建绘图对象
                     var toolBar = new Draw(map);
@@ -87,7 +92,8 @@
                             showTooltips:true
                         })
 
-                    })
+                    });
+
                     //绘图结束绑定事件
                     on(toolBar,"draw-end",function(result){
                         //获得面形状
@@ -97,11 +103,11 @@
                         map.graphics.add(graphicpoint);
                         //关闭绘图工具
                         toolBar.deactivate();
-                    })
+                    });
                     //给地图打印按钮绑定事件
                     on(dom.byId("Btn"),"click",function(){
                         //创建地图打印对象
-                        var printMap = new PrintTask("http://localhost:6080/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task");
+                        var printMap = new PrintTask(pTaskUrl);
                         //创建地图打印模版
                         var template = new PrintTemplate();
                         //创建地图的打印参数，参数里面包括：模版和地图
@@ -168,6 +174,25 @@
                 <div id="resultsDiv">
                 </div>
                 <br>
+                选择采样日期：
+                <input type="date" id="startdate" value="2017-01-21" />
+                <br>
+                选择样品类型：
+                <select id="task" onchange="changeSampleType();" style="height: 30px;width: 136px;">
+                    <option value="表层土壤样品" >表层土壤样品</option>
+                    <option value="沉积物剖面样品" selected>沉积物剖面</option>
+                </select><br>
+                选择查询核素类型：
+                <select id="nucType" style="height: 30px;width: 136px;">
+                    <option value="Sr" >铯核素</option>
+                </select>
+                <br>
+                <button id="querySample" data-dojo-type="dijit/form/Button" >筛选</button>
+                <br>
+                <button data-dojo-type="dijit/form/Button" >多边形查询</button>
+                <br>
+                <button data-dojo-type="dijit/form/Button">已完成查询</button>
+                <br>
             </div>
             <div id="parcelResultsPane" data-dojo-type="dijit/layout/ContentPane" title="插值分析">
             </div>
@@ -189,7 +214,10 @@
 
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right', splitter:'true'"
          style="background-color: #E0FFFF; width: 200px;">
-        环境放射性信息平台: <br><br>       李树为（科研用户）      <br><br><br>
+        环境放射性信息平台: <br>
+        <?php if($userInfo) {?>
+        <?=$_SESSION['realName']?>（<?=$_SESSION['userRole']?>）
+        <?php }?>
 
     </div>
 
@@ -201,3 +229,37 @@
 </div>
 </body>
 </html>
+<script type="text/javascript">
+    var sampleType = new Array();
+    sampleType["表层土壤样品"]  = ["铯核素", "碘核素", "钚核素", "铀核素", "锶核素"];
+    sampleType["沉积物剖面样品"] = ["铀核素", "碘核素", "钚核素"];
+    function changeSampleType()
+    {
+        var samp = document.getElementById("task").value;
+        var Nuc = document.getElementById("nucType");
+        Nuc.options.length = 0;
+        for (var i in sampleType[samp])
+        {
+            Nuc.options.add(new Option(sampleType[samp][i], sampleType[samp][i]));
+        }
+    }
+
+    function dofilitem() {
+        //var map = document.getElementById("mapDiv");
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

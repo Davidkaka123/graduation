@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>环境放射性信息平台</title>
     <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/tundra/tundra.css" />
     <link rel="stylesheet" href="<?=$controller->siteScriptsUrl?>/js/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css" />
@@ -23,6 +24,7 @@
     <script src="<?=$controller->siteScriptsUrl?>/js/config/config.js"></script>
 
     <script type="text/javascript">
+        <!-- Dojo模块和ESRI包引用-->
         require([
                     "dojo/parser",
                     "esri/map",
@@ -42,6 +44,7 @@
                     "dijit/layout/ContentPane",
                     "dijit/layout/AccordionContainer",
                     "dojo/domReady!"],
+                //回调函数设计
                 function (parser, Map, ArcGISTiledMapServiceLayer,
                           ArcGISDynamicMapServiceLayer,
                           dom, on, query, SimpleMarkerSymbol,
@@ -53,6 +56,7 @@
                           Color) {
                     parser.parse();
 
+                    //根据需求参数创建地图对象
                     var map = new Map(
                             "mapDiv",
                             {
@@ -61,17 +65,30 @@
                                 zoom : 1,
                                 sliderStyle : "large"
                             });
-
+                    //加载基础地理信息数据
+                    //生成基础地理信息图层
                     var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4] });
-
+                    //将新图层叠加到地图
                     map.addLayer(agoLayer);
-
-                    var krigMapServiceLayer = new ArcGISDynamicMapServiceLayer(I129krigUrl);
-
-                    map.addLayer(krigMapServiceLayer);
-
-                    var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(sedimentUrl);
+                    //加载放射性核素数据
+                    var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(dynamicUrl);
+                    //将核素数据图层叠加到地图
                     map.addLayer(dynamicMapServiceLayer);
+                    var sedimentLayer = new ArcGISDynamicMapServiceLayer(sedimentUrl);
+                    map.addLayer(sedimentLayer);
+
+                    //添加鼠标响应事件
+                    map.on('mouse-move', showCoordinates);
+                    map.on('mouse-drag', showCoordinates);
+
+                    function showCoordinates(event) {
+                        var level = map.getLevel();
+                        var pres = Math.min(6, level);
+                        var x = event.mapPoint.x.toFixed(pres);
+                        var y = event.mapPoint.y.toFixed(pres);
+                        document.getElementById('mapPosition').innerHTML = x + " " + y;  //string.substitute('${0}, ${1}', [x, y]);
+                    }
+
 
                     //创建绘图对象
                     var toolBar = new Draw(map);
@@ -88,6 +105,7 @@
                         })
 
                     })
+
                     //绘图结束绑定事件
                     on(toolBar,"draw-end",function(result){
                         //获得面形状
@@ -98,6 +116,7 @@
                         //关闭绘图工具
                         toolBar.deactivate();
                     })
+
                     //给地图打印按钮绑定事件
                     on(dom.byId("Btn"),"click",function(){
                         //创建地图打印对象
@@ -131,6 +150,7 @@
                             }
                         })
                     })
+
 
 
                 });
@@ -189,8 +209,10 @@
 
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right', splitter:'true'"
          style="background-color: #E0FFFF; width: 200px;">
-        环境放射性信息平台: <br><br>       李树为（科研用户）      <br><br><br>
-
+        欢迎光临环境放射性信息平台<br>
+        <?php if($userInfo) {?>
+            <?=$_SESSION['realName']?>（<?=$_SESSION['userRole']?>）
+        <?php }?>
     </div>
 
     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:'true'"
@@ -201,3 +223,19 @@
 </div>
 </body>
 </html>
+<!--<script type="text/javascript">-->
+    <!--function changeSampleType()-->
+    <!--{-->
+<!--//        var sampleType = document.getElementById("task").value;-->
+<!--//        var NucType = document.getElementById("sampleType");-->
+<!--//        if (sampleType == "表层土壤样品") {-->
+<!--//            <?php for ($item in $surface) {?>-->
+<!--//                NucType.options.add(new Option(<?=$item?>, <?=$item?>));-->
+<!--//            <?php }?>-->
+<!--//        } else if(sampleType == "沉积物剖面样品") {-->
+<!--//            <?php for ($item in $sedim) {?>-->
+<!--//                NucType.options.add(new Option(<?=$item?>, <?=$item?>));-->
+<!--//            <?php }?>-->
+<!--//        }-->
+    <!--}-->
+<!--</script>-->

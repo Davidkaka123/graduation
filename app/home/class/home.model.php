@@ -20,10 +20,33 @@ else
 
 class HomeModel extends AppModel
 {
+    public $row;
     public function __construct(& $controller)
     {
         parent::__construct($controller);
     }
+
+    public function printline()
+    {
+    }
+    public function loginCheck($name, $passwd, $row)
+    {
+        if ($row) {
+            if ($name == $row['userName'] && $passwd == $row['passwd'])
+            {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+
+
+
+
 
 }
 

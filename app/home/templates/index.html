@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Home</title>
+<!-- Custom Theme files -->
+<link href="<?=$controller->siteScriptsUrl?>/common/style.css" rel="stylesheet" type="text/css" media="all"/>
+<!-- Custom Theme files -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<!--Google Fonts-->
+<!--<link href='http://fonts.useso.com/css?family=Roboto:500,900italic,900,400italic,100,700italic,300,700,500italic,100italic,300italic,400' rel='stylesheet' type='text/css'>-->
+<!--<link href='http://fonts.useso.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>-->
+<!--Google Fonts-->
+</head>
+<body>
+<div class="login">
+	<h2>环境放射性信息平台</h2>
+	<div class="login-top">
+		<h1>请登录</h1>
+		<form id="myform" name="myform" action="<?=$controller->baseUrl?>/logincheck" method="post">
+			<input type="text" id="name" name="name" value="User Id" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'User Id';}">
+			<input type="password" id="passwd" name="passwd" value="password" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'password';}">
+	    </form>
+	    <div class="forgot">
+	    	<a href="#">忘记密码</a>
+	    	<input type="submit" onclick="submit();" value="登录平台" >
+	    </div>
+	</div>
+	<div class="login-bottom">
+		<h3>新用户 &nbsp;<a href="#">请注册</a>&nbsp</h3>
+	</div>
+</div>	
+<div class="copyright">
+	<p>
+	<P><FONT style="font-size: 9pt">地　　址：陕西省西安市咸宁西路２８号　邮编７１００４９</FONT></P>
+	<P><FONT style="font-size: 9pt">版权所有：西安交通大学　软件学院　　　　　　　　　　　</FONT></P>
+	</p>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+	function submit()
+	{
+        document.getElementById('myform').submit();
+	}
+
+
+</script>
+
+
+
+
+
+
+
+
+
