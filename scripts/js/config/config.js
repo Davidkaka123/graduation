@@ -5,6 +5,8 @@ var agoServiceURL = "http://localhost:6080/arcgis/rest/services/radiowatch/radio
 
 var dynamicUrl = "http://localhost:6080/arcgis/rest/services/radiowatch/surfaceoildata/MapServer";
 
+var surfaceUrl = "http://localhost:6080/arcgis/rest/services/radiowatch/surfaceoildata/MapServer";
+
 var mainLandURL = "http://localhost:6080/arcgis/rest/services/radiowatch/mainland/MapServer";
 
 var bjBaseUrl = "http://localhost:6080/arcgis/rest/services/radiowatch/radioWatchBaseBJ/MapServer";
@@ -26,3 +28,9 @@ var bufferedafter = "http://localhost:6080/arcgis/rest/services/radiowatch/buffe
 var cached = "http://127.0.0.1:8080/tilemap?level={z}&ix={x}&iy={y}";
 
 var pTaskUrl = "http://localhost:6080/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task";
+
+var surfaceid = "surfacesample";
+
+var sedimentid = "sedimentsample";
+
+

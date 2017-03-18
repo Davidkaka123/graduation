@@ -63,18 +63,31 @@
                             });
 
                     var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4] });
-
+                    agoLayer.id = "basemap";
                     map.addLayer(agoLayer);
 
-                    var surfaceMapServiceLayer = new ArcGISDynamicMapServiceLayer(dynamicUrl);
-
-                    map.addLayer(surfaceMapServiceLayer);
-
-                    var sedimeMapServiceLayer = new ArcGISDynamicMapServiceLayer(sedimentUrl);
-                    map.addLayer(sedimeMapServiceLayer);
+//                    var surfaceMapServiceLayer = new ArcGISDynamicMapServiceLayer(dynamicUrl);
+//                    surfaceMapServiceLayer.id = "surfacesample";
+//                    map.addLayer(surfaceMapServiceLayer);
+//
+//                    var sedimeMapServiceLayer = new ArcGISDynamicMapServiceLayer(sedimentUrl);
+//                    sedimeMapServiceLayer.id = "sedimesample";
+//                    map.addLayer(sedimeMapServiceLayer);
 
                     on(dom.byId("querySample"), "click", function(){
-                        alert("过滤啦");
+                        var choseLayer = dofilitem();
+//                        alert(choseLayer["url"] + choseLayer["id"]);
+//                        alert(map.layerIds);
+                        var choseMapServiceLayer = ArcGISDynamicMapServiceLayer(choseLayer["url"]);
+                        choseMapServiceLayer.id = choseLayer["id"];
+                        map.addLayer(choseMapServiceLayer);
+                        for (var tmp in map.layerIds) {
+                            if (map.layerIds[tmp] == "basemap" || map.layerIds[tmp] == choseLayer["id"]) {
+                                continue;
+                            } else {
+                                map.removeLayer(map.getLayer(map.layerIds[tmp]));
+                            }
+                        }
                     });
 
 
@@ -246,7 +259,19 @@
 
     function dofilitem() {
         //var map = document.getElementById("mapDiv");
-
+        var layerName = document.getElementById("task").value;
+        var source = new Array();
+        switch (layerName) {
+            case "表层土壤样品":
+                    source["url"] = surfaceUrl;
+                    source["id"] = surfaceid;
+                break;
+            case "沉积物剖面样品":
+                    source["url"] = sedimentUrl;
+                    source["id"] = sedimentid;
+                break;
+        }
+        return source;
     }
 
 
